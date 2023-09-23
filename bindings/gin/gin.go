@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -9,6 +10,10 @@ import (
 )
 
 func NewGinBinding(ops domain.Ops) *gin.Engine {
+	if os.Getenv("GIN_MODE") != "debug" {
+		gin.SetMode("release")
+	}
+
 	r := gin.Default()
 	r.SetTrustedProxies(nil)
 
