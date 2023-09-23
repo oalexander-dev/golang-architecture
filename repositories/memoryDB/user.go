@@ -22,8 +22,16 @@ func (r userRepo) GetByID(id int64) (domain.User, error) {
 	return domain.User{}, nil
 }
 
-func (r userRepo) Create(user domain.User) (domain.User, error) {
-	r.DB.Users = append(r.DB.Users, user)
+func (r userRepo) Create(user domain.UserInput) (domain.User, error) {
+	id := int64(len(r.DB.Users))
 
-	return user, nil
+	userWithId := domain.User{
+		ID:       id,
+		Username: user.Username,
+		FullName: user.FullName,
+	}
+
+	r.DB.Users = append(r.DB.Users, userWithId)
+
+	return userWithId, nil
 }

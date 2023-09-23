@@ -17,7 +17,7 @@ func (u userOps) GetByID(id int64) (domain.User, error) {
 	return user, err
 }
 
-func (u userOps) Create(user domain.User) (domain.User, error) {
-	user, err := u.Repo.User.Create(user)
-	return user, err
+func (u userOps) Create(user domain.UserInput) (domain.User, error) {
+	savedUser, err := u.Repo.User.Create(user)
+	return savedUser, err
 }

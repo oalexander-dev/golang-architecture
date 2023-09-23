@@ -35,20 +35,20 @@ func NewGinBinding(ops domain.Ops) *gin.Engine {
 	})
 
 	r.POST("/users", func(c *gin.Context) {
-		var user domain.User
+		var user domain.UserInput
 		err := c.ShouldBindJSON(&user)
 		if err != nil {
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
 
-		user, err = ops.User.Create(user)
+		savedUser, err := ops.User.Create(user)
 		if err != nil {
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
 
-		c.JSON(http.StatusCreated, user)
+		c.JSON(http.StatusCreated, savedUser)
 	})
 
 	return r

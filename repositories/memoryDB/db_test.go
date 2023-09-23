@@ -20,18 +20,17 @@ func TestNewMemoryRepo(t *testing.T) {
 func TestAddUser(t *testing.T) {
 	memoryRepo := repositories.NewMemoryRepo()
 
-	userToAdd := domain.User{
-		ID:       1,
+	userToAdd := domain.UserInput{
 		Username: "testuser1",
 		FullName: "Test User 1",
 	}
 
-	_, err := memoryRepo.User.Create(userToAdd)
+	user, err := memoryRepo.User.Create(userToAdd)
 	if err != nil {
 		t.Fatal("Unexpected error occurred in user create")
 	}
 
-	user, err := memoryRepo.User.GetByID(1)
+	user, err = memoryRepo.User.GetByID(user.ID)
 	if err != nil {
 		t.Fatal("Unexpected error occurred retrieving user")
 	}

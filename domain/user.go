@@ -6,12 +6,17 @@ type User struct {
 	FullName string `json:"fullName"`
 }
 
+type UserInput struct {
+	Username string `json:"username"`
+	FullName string `json:"fullName"`
+}
+
 type UserRepo interface {
 	GetByID(id int64) (User, error)
-	Create(user User) (User, error)
+	Create(user UserInput) (User, error)
 }
 
 type UserOps interface {
 	GetByID(id int64) (User, error)
-	Create(user User) (User, error)
+	Create(user UserInput) (User, error)
 }
