@@ -1,6 +1,10 @@
 package repositories
 
-import "github.com/oalexander-dev/golang-architecture/domain"
+import (
+	"errors"
+
+	"github.com/oalexander-dev/golang-architecture/domain"
+)
 
 type userRepo struct {
 	DB *data
@@ -19,7 +23,17 @@ func (r userRepo) GetByID(id int64) (domain.User, error) {
 		}
 	}
 
-	return domain.User{}, nil
+	return domain.User{}, errors.New("does not exist")
+}
+
+func (r userRepo) GetByUsername(username string) (domain.User, error) {
+	for _, user := range r.DB.Users {
+		if user.Username == username {
+			return user, nil
+		}
+	}
+
+	return domain.User{}, errors.New("does not exist")
 }
 
 func (r userRepo) Create(user domain.UserInput) (domain.User, error) {
@@ -29,6 +43,7 @@ func (r userRepo) Create(user domain.UserInput) (domain.User, error) {
 		ID:       id,
 		Username: user.Username,
 		FullName: user.FullName,
+		Password: user.Password,
 	}
 
 	r.DB.Users = append(r.DB.Users, userWithId)
