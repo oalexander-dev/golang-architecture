@@ -13,7 +13,6 @@ type jwtConfig struct {
 	SecretKey   string
 	Timeout     time.Duration
 	MaxRefresh  time.Duration
-	Realm       string
 }
 
 func newGinJwtMiddleware(config jwtConfig, ops domain.Ops) (*jwt.GinJWTMiddleware, error) {

@@ -3,29 +3,32 @@ package bindings
 import (
 	"fmt"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/oalexander-dev/golang-architecture/domain"
 )
 
-func NewGinBinding(ops domain.Ops) *gin.Engine {
-	if os.Getenv("GIN_MODE") != "debug" {
-		gin.SetMode("release")
-	}
+type GinBindingConfig struct {
+	GinMode   string
+	SecretKey string
+}
+
+func NewGinBinding(ops domain.Ops, config GinBindingConfig) *gin.Engine {
+	gin.SetMode(config.GinMode)
 
 	r := gin.Default()
 	r.SetTrustedProxies(nil)
 
-	authMiddleware, err := newGinJwtMiddleware(jwtConfig{
+	ginJwtConfig := jwtConfig{
 		IdentityKey: "username",
-		SecretKey:   "12342213412asdfajs89epurhna98chcb",
-		Timeout:     time.Hour,
+		SecretKey:   config.SecretKey,
+		Timeout:     time.Minute * 30,
 		MaxRefresh:  time.Hour * 12,
-		Realm:       "test",
-	}, ops)
+	}
+
+	authMiddleware, err := newGinJwtMiddleware(ginJwtConfig, ops)
 	if err != nil {
 		panic("failed to initialize JWT middleware")
 	}
@@ -59,7 +62,11 @@ func NewGinBinding(ops domain.Ops) *gin.Engine {
 					return
 				}
 
-				c.JSON(http.StatusCreated, savedUser)
+				c.JSON(http.StatusCreated, gin.H{
+					"id":       savedUser.ID,
+					"username": savedUser.Username,
+					"fullName": user.FullName,
+				})
 			})
 		}
 
@@ -68,27 +75,35 @@ func NewGinBinding(ops domain.Ops) *gin.Engine {
 		userGroup := apiV1Group.Group("/users")
 		{
 			userGroup.GET("/me", func(c *gin.Context) {
-				claims, exists := c.Get("JWT_PAYLOAD")
-				if exists {
-					c.JSON(http.StatusOK, gin.H{
-						"claims": claims,
-					})
+				claims := jwt.ExtractClaims(c)
+				username := claims[ginJwtConfig.IdentityKey].(string)
+
+				if username == "" {
+					c.AbortWithStatus(http.StatusUnauthorized)
 					return
 				}
 
-				c.JSON(http.StatusUnauthorized, gin.H{
-					"claims": claims,
+				user, err := ops.User.GetByUsername(username)
+				if err != nil {
+					c.AbortWithStatus(http.StatusNotFound)
+					return
+				}
+
+				c.JSON(http.StatusOK, gin.H{
+					"username": username,
+					"id":       user.ID,
+					"fullName": user.FullName,
 				})
 			})
 
-			userGroup.GET("/:id", func(c *gin.Context) {
-				id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-				if err != nil {
+			userGroup.GET("/:username", func(c *gin.Context) {
+				username := c.Param("username")
+				if err != nil || username == "" {
 					c.AbortWithStatus(http.StatusBadRequest)
 					return
 				}
 
-				user, err := ops.User.GetByID(id)
+				user, err := ops.User.GetByUsername(username)
 				if err != nil {
 					c.AbortWithStatus(http.StatusNotFound)
 					return

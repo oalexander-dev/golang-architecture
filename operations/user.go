@@ -17,8 +17,8 @@ func newUserOps(r domain.Repo) domain.UserOps {
 	}
 }
 
-func (u userOps) GetByID(id int64) (domain.User, error) {
-	user, err := u.Repo.User.GetByID(id)
+func (u userOps) GetByUsername(username string) (domain.User, error) {
+	user, err := u.Repo.User.GetByUsername(username)
 	return user, err
 }
 
@@ -42,7 +42,7 @@ func (u userOps) Create(user domain.UserInput) (domain.User, error) {
 func (u userOps) CheckPassword(username string, passwordInput string) (domain.User, error) {
 	user, err := u.Repo.User.GetByUsername(username)
 	if err != nil {
-		return domain.User{}, err
+		return domain.User{}, errors.New("bad credentials")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(passwordInput))
