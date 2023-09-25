@@ -17,6 +17,14 @@ Fill out the missing values in the newly created `.env` file.
 ### Locally
 ```sh
 go run ./cmd/main.go
+# or
+go build ./cmd/main.go
+./main
+```
+
+### Tests
+```sh
+go test ./... -v
 ```
 
 ### Docker
