@@ -11,14 +11,17 @@ var validUserInputs = []domain.UserInput{
 	{
 		Username: "testuser1",
 		FullName: "Test User 1",
+		Password: "password1",
 	},
 	{
 		Username: "testuser2",
 		FullName: "Test User 2",
+		Password: "password2",
 	},
 	{
 		Username: "testuser3",
 		FullName: "Test User 3",
+		Password: "password3",
 	},
 }
 
@@ -37,6 +40,7 @@ func TestAddUser(t *testing.T) {
 	userToAdd := domain.UserInput{
 		Username: "testuser1",
 		FullName: "Test User 1",
+		Password: "password123",
 	}
 
 	originalUser, err := memoryRepo.User.Create(userToAdd)
@@ -49,7 +53,8 @@ func TestAddUser(t *testing.T) {
 		t.Fatal("Unexpected error occurred retrieving user")
 	}
 
-	if user.ID != originalUser.ID || user.Username != userToAdd.Username || user.FullName != userToAdd.FullName {
+	if user.ID != originalUser.ID || user.Username != userToAdd.Username ||
+		user.FullName != userToAdd.FullName || user.Password != userToAdd.Password {
 		t.Fatal("Wrong value for a field in the saved user")
 	}
 }
@@ -60,6 +65,7 @@ func TestAddUserMultiple(t *testing.T) {
 	userToAdd := domain.UserInput{
 		Username: "testuser1",
 		FullName: "Test User 1",
+		Password: "password123",
 	}
 
 	originalUser, err := memoryRepo.User.Create(userToAdd)
@@ -77,7 +83,8 @@ func TestAddUserMultiple(t *testing.T) {
 		t.Fatal("Unexpected error occurred retrieving first user")
 	}
 
-	if user.ID != originalUser.ID || user.Username != userToAdd.Username || user.FullName != userToAdd.FullName {
+	if user.ID != originalUser.ID || user.Username != userToAdd.Username ||
+		user.FullName != userToAdd.FullName {
 		t.Fatal("Wrong value for a field in the saved user")
 	}
 
@@ -86,7 +93,8 @@ func TestAddUserMultiple(t *testing.T) {
 		t.Fatal("Unexpected error occurred retrieving second user")
 	}
 
-	if user.ID != secondUser.ID || user.Username != userToAdd.Username || user.FullName != userToAdd.FullName {
+	if user.ID != secondUser.ID || user.Username != userToAdd.Username ||
+		user.FullName != userToAdd.FullName {
 		t.Fatal("Wrong value for a field in the saved user")
 	}
 }
@@ -106,7 +114,8 @@ func TestGetUser(t *testing.T) {
 		t.Fatal("Unexpected error occurred retrieving user")
 	}
 
-	if user.ID != originalUser.ID || user.Username != userToAdd.Username || user.FullName != userToAdd.FullName {
+	if user.ID != originalUser.ID || user.Username != userToAdd.Username ||
+		user.FullName != userToAdd.FullName || user.Password != originalUser.Password {
 		t.Fatal("Wrong value for a field in the saved user")
 	}
 }
@@ -119,6 +128,7 @@ func TestGetUserWithMultiple(t *testing.T) {
 	userToAdd := domain.UserInput{
 		Username: "testuser4",
 		FullName: "Test User 4",
+		Password: "password123",
 	}
 
 	originalUser, err := memoryRepo.User.Create(userToAdd)
@@ -131,7 +141,8 @@ func TestGetUserWithMultiple(t *testing.T) {
 		t.Fatal("Unexpected error occurred retrieving user")
 	}
 
-	if user.ID != originalUser.ID || user.Username != userToAdd.Username || user.FullName != userToAdd.FullName {
+	if user.ID != originalUser.ID || user.Username != userToAdd.Username ||
+		user.FullName != userToAdd.FullName || user.Password != userToAdd.Password {
 		t.Fatal("Wrong value for a field in the saved user")
 	}
 }
